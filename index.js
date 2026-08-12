@@ -96,8 +96,8 @@ postProcessing.outputNode = dotPass;
 
 
 function animate() {
-    knot.rotation.x += 0.01;
-    knot.rotation.y += 0.01;
+    knot.rotation.x += 0.005;
+    knot.rotation.y += 0.005;
     
     const direction = new THREE.Vector3().subVectors(camera.position, controls.target);
     const currentDistance = direction.length();
@@ -106,9 +106,6 @@ function animate() {
 
     direction.setLength(newDistance);
     camera.position.copy(controls.target).add(direction);
-
-    //const current = dotPass.scale.value
-    //dotPass.scale.value = THREE.MathUtils.lerp(current, 0.1 * targetZoom, 0.05);
     
     controls.update();
 
@@ -116,19 +113,3 @@ function animate() {
 }
 
 renderer.setAnimationLoop(animate);
-
-
-/*
-const selectedObjects = [ knot ];
- const edgeStrength = uniform( 10.0 );
- const edgeGlow = uniform( 0.0 );
- const edgeThickness = uniform( 1.0 );
- const visibleEdgeColor = uniform( new THREE.Color( 0x0000ff ) );
- const hiddenEdgeColor = uniform( new THREE.Color( 0x0000ff ) );
- const outlinePass = outline( scene, camera, {
-    selectedObjects,
-    edgeGlow,
-    edgeThickness
- } );
- const outlineColor = outlinePass.mul( edgeStrength );
-*/

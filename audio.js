@@ -1,5 +1,14 @@
-var sound = new Howl({
-  src: ['Assets/Audio/ralsei-splat.mp3']
+const sound = new Howl({
+  src: ['Assets/Audio/ralsei-scream.mp3'],
+  volume: 1.0
 });
 
-sound.play();
+document.addEventListener('DOMContentLoaded', () => {
+  const button = document.querySelector('button');
+
+  if (button) {
+    button.addEventListener('click', () => {
+      sound.play();
+    });
+  }
+});
