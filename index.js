@@ -41,7 +41,8 @@ const minZoom = 2;
 const maxZoom = 10;
 const lerpZoomFactor = 0.05;
 
-const geometry = new THREE.TorusKnotGeometry(1, 0.35, 256, 64);
+//const geometry = new THREE.TorusKnotGeometry(1, 0.35, 256, 64);
+const geometry = new THREE.TorusGeometry(1.3, 0.5, 32, 72);
 const material = new THREE.MeshLambertNodeMaterial({ 
     color: 0xffffff
 });
@@ -78,12 +79,12 @@ const steppedTime = floor(time.mul(10));
 const aspectRatio = viewportResolution.x.div(viewportResolution.y);
 const correctedUv = uv().mul(vec2(aspectRatio, float(1.0)));
 const noiseFrequency = float(100);
-const distortionScale = float(0.001);
+const distortionScale = float(0.0015);
 const animOffset = steppedTime.mul(100);
 const samplePos = correctedUv.mul(noiseFrequency);
 const noiseX = mx_noise_float(samplePos.add(vec2(animOffset, 0.0)));
 const noiseY = mx_noise_float(samplePos.add(vec2(0.0, animOffset)));
-const proceduralOffset = vec2(noiseX, noiseY).mul(distortionScale);
+const proceduralOffset = vec2(noiseX, noiseY.mul(1.1)).mul(distortionScale);
 const distortedUv = uv().add(proceduralOffset);
 const distortedSceneNode = scenePass.getTextureNode('output').uv(distortedUv);
 
@@ -95,8 +96,8 @@ postProcessing.outputNode = dotPass;
 
 
 function animate() {
-    knot.rotation.x += 0.00;
-    knot.rotation.y += 0.00;
+    knot.rotation.x += 0.01;
+    knot.rotation.y += 0.01;
     
     const direction = new THREE.Vector3().subVectors(camera.position, controls.target);
     const currentDistance = direction.length();
