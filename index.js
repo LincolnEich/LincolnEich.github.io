@@ -90,7 +90,7 @@ const distortedSceneNode = scenePass.getTextureNode('output').uv(distortedUv);
 
 const filmPass = film(distortedSceneNode, 1);
 const dotPass = dotScreen(filmPass);
-dotPass.scale.value = 4;
+dotPass.scale.value = 1.4;
 
 postProcessing.outputNode = dotPass;
 
