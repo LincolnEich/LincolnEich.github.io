@@ -6,8 +6,8 @@
 }
 
 body {
-    height: 100vh;
-    width: 100vw;
+    height: 100dvh;
+    width: 100dvw;
     margin: 0;
     padding: 0;
     background-color: rgb(255, 255, 255);
@@ -21,8 +21,10 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
+    flex-wrap: wrap;
     gap: 2%;
     transform: translateY(-2%);
+    overflow: hidden;
     pointer-events: none;
     z-index: 0;
 }
@@ -34,8 +36,10 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
+    flex-wrap: wrap;
     gap: 2%;
     transform: translateY(-2%);
+    overflow: hidden;
     pointer-events: none;
     z-index: 2;
 }
@@ -67,6 +71,7 @@ h2 {
 }
 
 h3 {
+  margin: 0;
     visibility: hidden;
     text-align: center;
     font-family: 'Cooper', Arial, serif;
@@ -75,6 +80,7 @@ h3 {
 }
 
 h4 {
+  margin: 0;
     visibility: hidden;
     text-align: center;
     font-family: 'Libre Baskerville', Arial, serif;
@@ -83,25 +89,27 @@ h4 {
 }
 
 canvas {
-    position: absolute;
-    width: 100vw;
-    height: 100vh;
+  position: absolute;
+  width: 100vw;
+  height: 100vh;
 
-    z-index: 1;
-    opacity: 0;
-    animation: fadeIn 1.5s ease-in-out 0s forwards;
+  z-index: 1;
+  opacity: 0;
+  animation: fadeIn 1.5s ease-in-out 0s forwards;
     
-    display: block;
+  /*display: block;*/
+  overflow: hidden;
 }
 
 .container3 {
   position: absolute;
-  width: 100vw;
-  height: 100vh;
+  width: 100dvw;
+  height: 100dvh;
   display: flex;
   justify-content: center;
   align-items: center;
-  transform: translateY(38%);
+  transform: translateY(38vh);
+  overflow: hidden;
   pointer-events: none;
   z-index: 2;
 }
@@ -109,8 +117,8 @@ canvas {
 button {
   position: absolute;
   margin: 0;
-  padding: 1.5%;
-  border: 7px double rgba(20, 20, 20, 1);
+  padding: 1.75vmax;
+  border: 0.5vmax double rgba(20, 20, 20, 1);
   border-radius: 100px;
   box-shadow: 0px 5px 10px rgba(20, 20, 20, 0.75);
   cursor: pointer;
@@ -128,6 +136,13 @@ button {
 
   transition: box-shadow 0.2s ease, transform 0.2s ease;
   animation: fadeIn 1.5s ease-in-out forwards, easeUp 1.5s ease-out;
+}
+
+@media (max-aspect-ratio: 1/1) {
+  button {
+    padding: 3vmax;
+    border: 0.85vmax double rgba(20, 20, 20, 1);
+  }
 }
 
 button:hover {
