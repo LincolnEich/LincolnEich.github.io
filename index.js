@@ -23,7 +23,11 @@ let h = container.clientHeight;
 const scene = new THREE.Scene();
 scene.background = null;
 const camera = new THREE.PerspectiveCamera(20, w / h, 1, 10000);
-camera.position.z = 18 - ((camera.aspect - 1.8) / 0.1);
+if (w < h) {
+            camera.position.z = 18 / camera.aspect / 1.3;
+        } else {
+            camera.position.z = 20;
+        }
 const renderer = new THREE.WebGPURenderer({antialias: true});
 renderer.setSize(w, h, false);
 document.body.appendChild(renderer.domElement);
@@ -44,6 +48,7 @@ const lerpZoomFactor = 0.05;
 
 //const geometry = new THREE.TorusKnotGeometry(1, 0.35, 256, 64);
 const geometry = new THREE.TorusGeometry(1.3, 0.5, 32, 72);
+//const geometry = new THREE.BoxGeometry(1.5, 1.5, 1.5);
 const material = new THREE.MeshLambertNodeMaterial({ 
     color: 0xffffff
 });
@@ -65,10 +70,15 @@ function onWindowResize() {
         camera.aspect = w / h;
         camera.updateProjectionMatrix();
 
+        console.log(camera.aspect);
+
         renderer.setSize(w, h);
         renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-        console.log(Math.max(w/h, h/w));
-        targetZoom = 18 - Math.max(w/h, h/w);
+        if (w < h) {
+            targetZoom = 18 / camera.aspect / 1.1;
+        } else {
+            targetZoom = 20;
+        }
     });
 }
 
@@ -84,8 +94,6 @@ const scenePass = pass(scene, camera);
 scenePass.samples = 4; 
 const scenePassColor = scenePass.getTextureNode(); 
 
-const textureLoader = new THREE.TextureLoader();
-const noisetexture = textureLoader.load('path/to/noise.png');
 const steppedTime = floor(time.mul(10));
 const aspectRatio = screenSize.x.div(screenSize.y);
 const correctedUv = uv().mul(vec2(aspectRatio, float(1.0)));
@@ -97,12 +105,12 @@ const noiseX = mx_noise_float(samplePos.add(vec2(animOffset, 0.0)));
 const noiseY = mx_noise_float(samplePos.add(vec2(0.0, animOffset)));
 const proceduralOffset = vec2(noiseX, noiseY.mul(1.1)).mul(distortionScale);
 const distortedUv = uv().add(proceduralOffset);
-const distortedSceneNode = scenePass.getTextureNode('output').uv(distortedUv);
+const distortedSceneNode = scenePass.getTextureNode('output').sample(distortedUv);
 
 const filmPass = film(distortedSceneNode, 1);
 const dotPass = dotScreen(filmPass);
 dotPass.scale.value = 1.4;
-
+    
 postProcessing.outputNode = dotPass;
 
 

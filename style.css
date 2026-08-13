@@ -6,86 +6,88 @@
 }
 
 body {
-    height: 100dvh;
-    width: 100dvw;
-    margin: 0;
-    padding: 0;
-    background-color: rgb(255, 255, 255);
-    overflow: hidden;
+  height: 100dvh;
+  width: 100dvw;
+  margin: 0;
+  padding: 0;
+  background-color: rgb(255, 255, 255);
+  overflow: hidden;
 }
 
 .container1 {
-    position: absolute;
-    width: 100vw;
-    height: 100vh;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 2%;
-    transform: translateY(-2%);
-    overflow: hidden;
-    pointer-events: none;
-    z-index: 0;
+  position: absolute;
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  align-content: center;
+  flex-wrap: wrap;
+  gap: 4%;
+  transform: translateY(-2%);
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 0;
 }
 
 .container2 {
-    position: absolute;
-    width: 100vw;
-    height: 100vh;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 2%;
-    transform: translateY(-2%);
-    overflow: hidden;
-    pointer-events: none;
-    z-index: 2;
+  position: absolute;
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  align-content: center;
+  flex-wrap: wrap;
+  gap: 4%;
+  transform: translateY(-2%);
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 2;
 }
 
 h1 {
-    margin: 0;
-    text-align: center;
-    font-family: 'Libre Baskerville', Arial, serif;
-    font-size: 1000%;
-    font-weight: 700;
-    color: rgb(25, 25, 25);
-    text-shadow: 0px 1px 5px rgba(20, 20, 20, 0.75);
-    pointer-events: all;
-    opacity: 0;
-    animation: fadeIn 1.5s ease-in-out forwards, easeUp 1.5s ease-out forwards, wobble 3s ease-in-out 2s infinite;
+  margin: 0;
+  text-align: center;
+  font-family: 'Libre Baskerville', Arial, serif;
+  font-size: 8vmax;
+  font-weight: 700;
+  color: rgb(25, 25, 25);
+  text-shadow: 0px 1px 5px rgba(20, 20, 20, 0.75);
+  pointer-events: all;
+  opacity: 0;
+  animation: fadeIn 1.5s ease-in-out forwards, easeUp 1.5s ease-out forwards, wobble 3s ease-in-out 2s infinite;
 }
 
 h2 {
-    margin: 0;
-    text-align: center;
-    font-family: 'Cooper', Arial, serif;
-    font-size: 1000%;
-    font-weight: 400;
-    color: rgb(25, 25, 25);
-    text-shadow: 0px 1px 5px rgba(20, 20, 20, 0.75);
-    pointer-events: all;
-    opacity: 0;
-    animation: fadeIn 1.5s ease-in-out forwards, easeUp 1.5s ease-out forwards, bob 3s ease-in-out 1.5s infinite;
+  margin: 0;
+  text-align: center;
+  font-family: 'Cooper', Arial, serif;
+  font-size: 8vmax;
+  font-weight: 400;
+  color: rgb(25, 25, 25);
+  text-shadow: 0px 1px 5px rgba(20, 20, 20, 0.75);
+  pointer-events: all;
+  opacity: 0;
+  animation: fadeIn 1.5s ease-in-out forwards, easeUp 1.5s ease-out forwards, bob 3s ease-in-out 1.5s infinite;
 }
 
 h3 {
   margin: 0;
-    visibility: hidden;
-    text-align: center;
-    font-family: 'Cooper', Arial, serif;
-    font-size: 1000%;
-    font-weight: 400;
+  visibility: hidden;
+  text-align: center;
+  font-family: 'Cooper', Arial, serif;
+  font-size: 8vmax;
+  font-weight: 400;
 }
 
 h4 {
   margin: 0;
-    visibility: hidden;
-    text-align: center;
-    font-family: 'Libre Baskerville', Arial, serif;
-    font-size: 1000%;
-    font-weight: 700;
+  visibility: hidden;
+  text-align: center;
+  font-family: 'Libre Baskerville', Arial, serif;
+  font-size: 8vmax;
+  font-weight: 700;
 }
 
 canvas {
@@ -117,19 +119,13 @@ canvas {
 button {
   position: absolute;
   margin: 0;
-  padding: 1.75vmax;
-  border: 0.5vmax double rgba(20, 20, 20, 1);
+  padding: 4vmin;
+  border: 1vmin double rgba(20, 20, 20, 1);
   border-radius: 100px;
   box-shadow: 0px 5px 10px rgba(20, 20, 20, 0.75);
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
   outline: none;
-
-  font-family: 'Cooper', Arial, serif;
-  font-size: 2rem;
-  font-weight: 400;
-  color: rgb(25, 25, 25);
-  text-shadow: 0px 1px 3px rgba(20, 20, 20, 0.75);
 
   pointer-events: all;
   z-index: 2;
@@ -140,8 +136,8 @@ button {
 
 @media (max-aspect-ratio: 1/1) {
   button {
-    padding: 3vmax;
-    border: 0.85vmax double rgba(20, 20, 20, 1);
+    padding: 4vmax;
+    border: 1vmax double rgba(20, 20, 20, 1);
   }
 }
 
