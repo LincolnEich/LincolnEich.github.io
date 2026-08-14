@@ -30,6 +30,9 @@ if (w < h)
     { camera.position.z = 20; }
 const renderer = new THREE.WebGPURenderer({antialias: true});
 renderer.setSize(w, h, false);
+camera.aspect = w/h;
+camera.updateProjectionMatrix();
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 document.body.appendChild(renderer.domElement);
 renderer.setClearColor(0x000000, 0);
 await renderer.init()
