@@ -2,19 +2,9 @@ import * as THREE from 'three/webgpu';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { CSS2DRenderer } from 'three/addons/renderers/CSS2DRenderer.js';
-import { CSS2DObject } from 'three/addons/renderers/CSS2DRenderer.js';
-import { pass,
-         uv,
-         time, 
-         vec2,
-         vec3,
-         float,
-         screenSize,
-         floor,
-         smoothstep,
-         dot,
-         sin,
-         mx_noise_float } from 'three/tsl';
+import { CSS2DObject } from 'three/addons/renderers/CSS2DRenderer.js'; 
+import { RapierPhysics } from 'three/addons/physics/RapierPhysics.js';
+import { uv, dot, sin, pass, time, vec2, vec3, float, floor, uniform, screenSize, smoothstep, mx_noise_float } from 'three/tsl';
 import { dotScreen } from 'three/addons/tsl/display/DotScreenNode.js';
 import { film } from 'three/addons/tsl/display/FilmNode.js';
 
@@ -92,6 +82,14 @@ const array = [shake, cube, knot];
 const hemiLight = new THREE.HemisphereLight(0xffffff, 0x000000, 2);
 scene.add(hemiLight);
 
+//Object Picking
+const raycaster = new THREE.Raycaster()
+const mouse = new THREE.Vector2()
+
+renderer.domElement.addEventListener('click', (e) => {
+
+})
+
 //CSS Elements
 const cssElement1 = document.createElement('div');
 cssElement1.className = 'Container1';
@@ -115,7 +113,7 @@ const Label3 = new CSS2DObject(cssElement3);
 scene.add(Label3);
 Label3.position.set(0, 2.3, 0);
 
-//Event Listeners
+//Screen Orientation Checks
 window.addEventListener('resize', onWindowResize, false);
 window.addEventListener('orientationchange', onWindowResize, false);
 
@@ -152,23 +150,50 @@ const scenePass = pass(scene, camera);
 scenePass.samples = 4; 
 const scenePassColor = scenePass.getTextureNode(); 
 
-const steppedTime = floor(time.mul(10));
+const initialTarget = new THREE.Vector3().copy(controls.target);
+const panXUniform = uniform(0);
+const panYUniform = uniform(0);
+const initialZoom = targetZoom;
+
+const scaleX = uniform(0);
+const scaleY = uniform(0);
+
+function updateUniforms() {
+    camera.updateMatrixWorld();
+    
+    const cameraRight = new THREE.Vector3();
+    const cameraUp = new THREE.Vector3();
+    camera.matrixWorld.extractBasis(cameraRight, cameraUp, new THREE.Vector3());
+
+    const panDisplacement = new THREE.Vector3().subVectors(controls.target, initialTarget);
+
+    const horizontalPan = panDisplacement.dot(cameraRight);
+    const verticalPan = panDisplacement.dot(cameraUp);
+
+    panXUniform.value = horizontalPan / (targetZoom / initialZoom);
+    panYUniform.value = verticalPan / (targetZoom / initialZoom);
+
+    scaleX.value = Math.max(h/w/1.25, 1);
+    scaleY.value = Math.max(w/h/1.25, 1);
+}
+
+const steppedTime = floor(time.mul(10)); //10
 const aspectRatio = screenSize.x.div(screenSize.y);
 const correctedUv = uv().mul(vec2(aspectRatio, float(1.0)));
-const noiseFrequency = float(100);
-const distortionScale = float(0.0015);
-const animOffset = steppedTime.mul(100);
+const noiseFrequency = float(100); //100
+const distortionScale = float(0.00125); //0.0015
+const animOffset = steppedTime.mul(500); //500
 const samplePos = correctedUv.mul(noiseFrequency);
-const noiseX = mx_noise_float(samplePos.add(vec2(animOffset, 0.0)));
-const noiseY = mx_noise_float(samplePos.add(vec2(0.0, animOffset)));
-const proceduralOffset = vec2(noiseX, noiseY.mul(1.1)).mul(distortionScale);
+const noiseX = mx_noise_float(samplePos.add(vec2(animOffset.add(panXUniform.mul(14)), panYUniform.mul(-14))));
+const noiseY = mx_noise_float(samplePos.add(vec2(panXUniform.mul(14), animOffset.sub(panYUniform.mul(14)))));
+const proceduralOffset = vec2(noiseX.mul(scaleX), noiseY.mul(scaleY)).mul(distortionScale);
 const distortedUv = uv().add(proceduralOffset);
 const distortedSceneNode = scenePass.getTextureNode('output').sample(distortedUv);
 
 const sceneAlpha = distortedSceneNode.a;
 const luminance = dot(vec3(0.2126, 0.7152, 0.0722), distortedSceneNode.rgb);
-const lineFrequency = float(300.0);
-const diagonalCoord = correctedUv.x.add(correctedUv.y).mul(lineFrequency);
+const lineFrequency = float(200); //200
+const diagonalCoord = correctedUv.x.add(panXUniform.div(7)).add((correctedUv.y).sub(panYUniform.div(7))).mul(lineFrequency);
 const diagonalLines = sin(diagonalCoord).mul(8);
 const shadowMask = (smoothstep(float(0.3), float(0.0), luminance)).div(5);
 const lineIntensity = diagonalLines.mul(shadowMask);
@@ -206,6 +231,8 @@ function animate() {
     cube.position.set(Math.sin(mytime) * 3, 0, Math.cos(mytime) * 3);
     Label1.position.set(cube.position.x, + 1.2, cube.position.z);
     Label2.position.set(shake.position.x, + 1.2, shake.position.z);
+
+    updateUniforms();
 
     postProcessing.render();
     labelRenderer.render(scene, camera);

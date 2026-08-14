@@ -113,7 +113,7 @@ canvas {
   display: flex;
   justify-content: center;
   align-items: center;
-  transform: translateY(38vh);
+  transform: translateY(38dvh);
   overflow: hidden;
   pointer-events: none;
   z-index: 2;
