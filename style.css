@@ -18,7 +18,7 @@ body {
 .container1 {
   position: absolute;
   width: 100vw;
-  height: 100vh;
+  height: 100dvh;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -35,7 +35,7 @@ body {
 .container2 {
   position: absolute;
   width: 100vw;
-  height: 100vh;
+  height: 100dvh;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -108,7 +108,7 @@ canvas {
 .container3 {
   position: absolute;
   width: 100vw;
-  height: 25vh;
+  height: 25dvh;
   top: 37%;
   display: flex;
   justify-content: center;
