@@ -166,7 +166,7 @@ const sceneAlpha = distortedSceneNode.a;
 const luminance = dot(vec3(0.2126, 0.7152, 0.0722), distortedSceneNode.rgb);
 const lineFrequency = float(300.0);
 const diagonalCoord = correctedUv.x.add(correctedUv.y).mul(lineFrequency);
-const diagonalLines = sin(diagonalCoord).mul(1);
+const diagonalLines = sin(diagonalCoord).mul(8);
 const shadowMask = (smoothstep(float(0.3), float(0.0), luminance)).div(5);
 const lineIntensity = diagonalLines.mul(shadowMask);
 const hatchedColor = distortedSceneNode.mul(lineIntensity);
@@ -176,7 +176,7 @@ const filmPass = film(finalHatch, 0.75);
 const dotPass = dotScreen(filmPass);
 dotPass.scale.value = 1.4;
 
-postProcessing.outputNode = filmPass;
+postProcessing.outputNode = dotPass;
 
 //Test Variables
 let mytime = 0;
