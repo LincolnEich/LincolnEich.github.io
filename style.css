@@ -6,6 +6,7 @@
 }
 
 body {
+  position: absolute;
   height: 100dvh;
   width: 100dvw;
   margin: 0;
@@ -25,6 +26,7 @@ body {
   flex-wrap: wrap;
   gap: 4%;
   transform: translateY(-2%);
+
   overflow: hidden;
   pointer-events: none;
   z-index: 0;
@@ -41,6 +43,7 @@ body {
   flex-wrap: wrap;
   gap: 4%;
   transform: translateY(-2%);
+
   overflow: hidden;
   pointer-events: none;
   z-index: 2;
@@ -54,7 +57,7 @@ h1 {
   font-weight: 700;
   color: rgb(25, 25, 25);
   text-shadow: 0px 1px 5px rgba(20, 20, 20, 0.75);
-  pointer-events: all;
+  pointer-events: auto;
   opacity: 0;
   animation: fadeIn 1.5s ease-in-out forwards, easeUp 1.5s ease-out forwards, wobble 3s ease-in-out 2s infinite;
 }
@@ -67,7 +70,7 @@ h2 {
   font-weight: 400;
   color: rgb(25, 25, 25);
   text-shadow: 0px 1px 5px rgba(20, 20, 20, 0.75);
-  pointer-events: all;
+  pointer-events: auto;
   opacity: 0;
   animation: fadeIn 1.5s ease-in-out forwards, easeUp 1.5s ease-out forwards, bob 3s ease-in-out 1.5s infinite;
 }
@@ -99,14 +102,14 @@ canvas {
   opacity: 0;
   animation: fadeIn 1.5s ease-in-out 0s forwards;
     
-  /*display: block;*/
   overflow: hidden;
 }
 
 .container3 {
   position: absolute;
-  width: 100dvw;
-  height: 100dvh;
+  width: 100vw;
+  height: 25vh;
+  top: 37%;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -127,7 +130,7 @@ button {
   -webkit-tap-highlight-color: transparent;
   outline: none;
 
-  pointer-events: all;
+  pointer-events: auto;
   z-index: 2;
 
   transition: box-shadow 0.2s ease, transform 0.2s ease;
@@ -152,6 +155,50 @@ button:active {
   transform: translateY(4px) scale(0.95);
   transition: box-shadow 0.05s ease, transform 0.05s ease;
 }
+
+
+div {
+  z-index: 3;
+  pointer-events: all;
+}
+
+.Container1 {
+  position: absolute;
+  margin: 0;
+  width: 10min;
+  height: 10min;
+  background-color: rgb(221, 221, 221);
+  border-radius: 20px;
+  box-shadow: 0px 5px 2px rgba(20, 20, 20, 0.75);
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  align-content: center;
+
+  pointer-events: all;
+  user-select: auto !important;
+  overflow: hidden;
+
+  animation: fadeIn 1.5s ease-in-out forwards;
+}
+
+h5 {
+  margin: 0;
+  padding: 5px;
+  text-align: center;
+  font-family: 'Cooper', Arial, serif;
+  font-size: 2vmax;
+  font-weight: 400;
+  color: rgb(25, 25, 25);
+  text-shadow: 0px 2px 3px rgba(20, 20, 20, 0.5);
+
+  pointer-events: all;
+  overflow: hidden;
+
+  animation: fadeIn 1.5s ease-in-out forwards;
+}
+
 
 @keyframes fadeIn {
   from {
