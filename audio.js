@@ -1,5 +1,5 @@
 const sound = new Howl({
-  src: ['Assets/Audio/Ralsei Scream.mp3'],
+  src: ['Assets/Audio/Terraria Coins.mp3'],
   volume: 1.0
 });
 

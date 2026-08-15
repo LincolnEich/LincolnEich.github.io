@@ -2,13 +2,13 @@ import * as THREE from 'three/webgpu';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { CSS2DRenderer } from 'three/addons/renderers/CSS2DRenderer.js';
-import { CSS2DObject } from 'three/addons/renderers/CSS2DRenderer.js'; 
-import { RapierPhysics } from 'three/addons/physics/RapierPhysics.js';
+import { CSS2DObject } from 'three/addons/renderers/CSS2DRenderer.js';
+import RAPIER from '@dimforge/rapier3d-compat';
 import { uv, dot, sin, pass, time, vec2, vec3, float, floor, uniform, screenSize, smoothstep, mx_noise_float } from 'three/tsl';
 import { dotScreen } from 'three/addons/tsl/display/DotScreenNode.js';
 import { film } from 'three/addons/tsl/display/FilmNode.js';
 
-// Initial Scene Setup
+/* --------------------------- Initial Scene Setup -------------------------- */
 const container = document.body
 let w = container.clientWidth;
 let h = container.clientHeight;
@@ -27,7 +27,14 @@ document.body.appendChild(renderer.domElement);
 renderer.setClearColor(0x000000, 0);
 await renderer.init()
 
-//Orbit Camera + Custom Zoom
+/* ------------------------------ Rapier Setup ------------------------------ */
+await RAPIER.init();
+const gravity = { x:0.0, y:-9.81, z:0.0 };
+const world = new RAPIER.World(gravity);
+const mainPhysicsObjects = [];
+const otherPhysicsObjects = [];
+
+/* ----------------------- Orbit Camera + Custom Zoom ----------------------- */
 const controls = new OrbitControls(camera, renderer.domElement);
 controls.enableDamping = true;
 controls.enableZoom = false;
@@ -39,7 +46,7 @@ const minZoom = 5;
 const maxZoom = 40;
 const lerpZoomFactor = 0.05;
 
-//CSS Label Setup
+/* ----------------------------- CSS Label Setup ---------------------------- */
 let labelRenderer = new CSS2DRenderer();
 labelRenderer.setSize(w, h);
 labelRenderer.domElement.style.position = 'absolute';
@@ -47,50 +54,112 @@ labelRenderer.domElement.style.top = '0px';
 labelRenderer.domElement.style.pointerEvents = 'none';
 document.body.appendChild( labelRenderer.domElement );
 
-//Scene Population
-//const geometry = new THREE.TorusKnotGeometry(1, 0.35, 256, 64);
-const geometry = new THREE.TorusGeometry(1.3, 0.5, 32, 72);
-const geometry2 = new THREE.BoxGeometry(1, 1, 1);
+/* -------------------------------------------------------------------------- */
+/*                              Scene Population                              */
+/* -------------------------------------------------------------------------- */
+
+const torusGeo = new THREE.TorusGeometry(1.3, 0.5, 32, 72);
+const boxGeo = new THREE.BoxGeometry(1, 1, 1);
 const material = new THREE.MeshLambertNodeMaterial({ 
     color: 0xffffff
 });
-const knot = new THREE.Mesh(geometry, material);
-const cube = new THREE.Mesh(geometry2, material);
+const knot = new THREE.Mesh(torusGeo, material);
+const cube = new THREE.Mesh(boxGeo, material);
 //knot.autoUpdate = true;
 //cube.autoUpdate = true;
 scene.add(knot, cube);
 
 cube.position.set(5, 0, 0);
 
-//GLTF Loader + Objects
+const groundGeo = new THREE.BoxGeometry(50, 0.2, 50);
+const groundMat = new THREE.MeshBasicMaterial({ color: 0xFFFFFF });
+const groundMesh = new THREE.Mesh(groundGeo, groundMat);
+groundMesh.position.set(0, -2, 0);
+groundMesh.visible = false; //==**==**==**==
+scene.add(groundMesh);
+
+/* -------------------------- GLTF Loader + Objects ------------------------- */
+
 const loader = new GLTFLoader();
 
 const shakeGlb = await loader.loadAsync('Assets/Models/Sunshake/scene.gltf');
 const shake = shakeGlb.scene;
+let shakeGeo = null;
+
 shake.traverse((child) =>{
     if (child.isMesh) {
-        //console.log(child.material);
         child.material.color.multiplyScalar(5);
+        child.material.needsUpdate = true;
+        shakeGeo = child.geometry;
     }
 })
+
 scene.add(shake);
 shake.scale.set(5, 5, 5);
 
 const array = [shake, cube, knot];
 
-//Lights
+/* ------------------------------ Physics Setup ----------------------------- */
+
+const groundBodyDesc = RAPIER.RigidBodyDesc.fixed().setTranslation(0, -2, 0);
+const groundBody = world.createRigidBody(groundBodyDesc);
+const groundColliderDesc = RAPIER.ColliderDesc.cuboid(5, 0.1, 5);
+world.createCollider(groundColliderDesc, groundBody);
+
+const knotBody = world.createRigidBody( RAPIER.RigidBodyDesc.kinematicPositionBased() );
+const knotDesc = RAPIER.ColliderDesc.trimesh( torusGeo.attributes.position.array, torusGeo.index.array );
+world.createCollider(knotDesc, knotBody);
+mainPhysicsObjects.push({mesh: knot, body: knotBody});
+
+const boxBody = world.createRigidBody( RAPIER.RigidBodyDesc.kinematicPositionBased() );
+const boxDesc = RAPIER.ColliderDesc.cuboid(0.5, 0.5, 0.5);
+world.createCollider(boxDesc, boxBody);
+mainPhysicsObjects.push({mesh: cube, body: boxBody});
+
+const shakeBody = world.createRigidBody( RAPIER.RigidBodyDesc.kinematicPositionBased() );
+const shakeDesc = RAPIER.ColliderDesc.trimesh( shakeGeo.attributes.position.array, shakeGeo.index.array );
+world.createCollider(shakeDesc, shakeBody);
+mainPhysicsObjects.push({mesh: shake, body: shakeBody});
+
+/* -------------------------- Other Physics Bodies -------------------------- */
+
+const button = document.getElementById("boxButton");
+
+button.addEventListener("click", async function() {
+    //const cubeGeo = new THREE.BoxGeometry(1,1,1);
+    //const cubeMat = new THREE.MeshLambertNodeMaterial({ color: 0xffffff });
+    //const cubeMesh = new THREE.Mesh(cubeGeo, cubeMat);
+    const cubeGlb = await loader.loadAsync('Assets/Models/Spud/cotton_from_scrap_mechanic.glb');
+        const cube = cubeGlb.scene;
+        let cubeGeo = null;
+
+        cube.traverse((child) =>{
+            if (child.isMesh) {
+                child.material.color.multiplyScalar(3);
+                child.material.needsUpdate = true;
+                cubeGeo = child.geometry;
+        }
+    })
+    cube.scale.set(12, 12, 12); 
+    scene.add(cube);
+
+    const cubeBody = world.createRigidBody( RAPIER.RigidBodyDesc.dynamic().setTranslation(0, 5, 0).setRotation(new THREE.Quaternion().setFromEuler(
+        new THREE.Euler(Math.random() * Math.PI * 2, Math.random() * Math.PI * 2, Math.random() * Math.PI * 2))) )
+    const cubeDesc = RAPIER.ColliderDesc.convexHull(cubeGeo.attributes.position.array).setMass(5).setRestitution(0.0);
+    world.createCollider(cubeDesc, cubeBody);
+    otherPhysicsObjects.push({mesh: cube, body: cubeBody});
+    
+});
+
+/* --------------------------------- Lights --------------------------------- */
+
 const hemiLight = new THREE.HemisphereLight(0xffffff, 0x000000, 2);
 scene.add(hemiLight);
 
-//Object Picking
-const raycaster = new THREE.Raycaster()
-const mouse = new THREE.Vector2()
+/* -------------------------------------------------------------------------- */
+/*                                CSS Elements                                */
+/* -------------------------------------------------------------------------- */
 
-renderer.domElement.addEventListener('click', (e) => {
-
-})
-
-//CSS Elements
 const cssElement1 = document.createElement('div');
 cssElement1.className = 'Container1';
 cssElement1.innerHTML = ` <h5>.Cube</h5> `;
@@ -113,7 +182,19 @@ const Label3 = new CSS2DObject(cssElement3);
 scene.add(Label3);
 Label3.position.set(0, 2.3, 0);
 
-//Screen Orientation Checks
+const cssElement4 = document.createElement('div');
+cssElement4.className = 'Container1';
+cssElement4.id = 'Container1';
+cssElement4.innerHTML = ` <h5>.Cotton</h5> `;
+
+const Label4 = new CSS2DObject(cssElement4);
+scene.add(Label4);
+Label4.position.set(0, 99999, 0);
+
+/* -------------------------------------------------------------------------- */
+/*                          Screen Orientation Checks                         */
+/* -------------------------------------------------------------------------- */
+
 window.addEventListener('resize', onWindowResize, false);
 window.addEventListener('orientationchange', onWindowResize, false);
 
@@ -143,7 +224,10 @@ window.addEventListener('wheel', (event) => {
     targetZoom = Math.max(minZoom, Math.min(maxZoom, targetZoom));
 });
 
-//Post Processing
+/* -------------------------------------------------------------------------- */
+/*                               Post Processing                              */
+/* -------------------------------------------------------------------------- */
+
 const postProcessing = new THREE.PostProcessing(renderer);
 const scenePass = pass(scene, camera);
 
@@ -194,7 +278,7 @@ const sceneAlpha = distortedSceneNode.a;
 const luminance = dot(vec3(0.2126, 0.7152, 0.0722), distortedSceneNode.rgb);
 const lineFrequency = float(200); //200
 const diagonalCoord = correctedUv.x.add(panXUniform.div(7)).add((correctedUv.y).sub(panYUniform.div(7))).mul(lineFrequency);
-const diagonalLines = sin(diagonalCoord).mul(8);
+const diagonalLines = sin(diagonalCoord).mul(8); //2?
 const shadowMask = (smoothstep(float(0.3), float(0.0), luminance)).div(5);
 const lineIntensity = diagonalLines.mul(shadowMask);
 const hatchedColor = distortedSceneNode.mul(lineIntensity);
@@ -206,10 +290,22 @@ dotPass.scale.value = 1.4;
 
 postProcessing.outputNode = dotPass;
 
-//Test Variables
+/* -------------------------------------------------------------------------- */
+/*                          Animate + Test Variables                          */
+/* -------------------------------------------------------------------------- */
+
 let mytime = 0;
 
+let rotX = 0;
+let rotY = 0;
+let rotZ = 0;
+const targetEuler = new THREE.Euler();
+const targetQuat = new THREE.Quaternion();
+
 function animate() {
+
+    /* ------------------------------ Camera Stuff ------------------------------ */
+
     const direction = new THREE.Vector3().subVectors(camera.position, controls.target);
     const currentDistance = direction.length();
 
@@ -220,17 +316,54 @@ function animate() {
     
     controls.update();
 
-    for (const object of array) {
-        object.rotation.x += 0.005 * (currentDistance - targetZoom) + 0.005;
-        object.rotation.y += 0.005 * (currentDistance - targetZoom) + 0.005;
+    world.step();
+
+    /* --------------------------- Object Manipulation -------------------------- */
+
+    rotX += 0.005 * (currentDistance - targetZoom) + 0.005;
+    rotY += 0.005 * (currentDistance - targetZoom) + 0.005;
+    //rotZ += 0.005 * (currentDistance - targetZoom) + 0.005;
+
+    for (const obj of mainPhysicsObjects) {
+        targetEuler.set(rotX, rotY*1.2, 0, 'XYZ');
+        targetQuat.setFromEuler(targetEuler);
+        obj.body.setNextKinematicRotation(targetQuat);
     }
 
     mytime += 0.01;
 
-    shake.position.set(Math.sin(mytime) * -3, 0, Math.cos(mytime) * -3);
-    cube.position.set(Math.sin(mytime) * 3, 0, Math.cos(mytime) * 3);
+    shakeBody.setNextKinematicTranslation({ x: Math.sin(mytime) * -3, y: 0, z: Math.cos(mytime) * -3 });
+    boxBody.setNextKinematicTranslation({ x: Math.sin(mytime) * 3, y: 0, z: Math.cos(mytime) * 3 });
     Label1.position.set(cube.position.x, + 1.2, cube.position.z);
     Label2.position.set(shake.position.x, + 1.2, shake.position.z);
+
+    for (const obj of mainPhysicsObjects) {
+        const position = obj.body.translation();
+        const rotation = obj.body.rotation();
+
+        obj.mesh.position.set(position.x, position.y, position.z);
+        obj.mesh.quaternion.set(rotation.x, rotation.y, rotation.z, rotation.w);
+    }
+
+    for (let i = 0; i <= otherPhysicsObjects.length - 1; i++) {
+        const obj = otherPhysicsObjects[i];
+        const position = obj.body.translation();
+        const rotation = obj.body.rotation();
+
+        obj.mesh.position.set(position.x, position.y, position.z);
+        obj.mesh.quaternion.set(rotation.x, rotation.y, rotation.z, rotation.w);
+
+        if (position.y < -25) {
+            world.removeRigidBody(obj.body);
+            scene.remove(obj.mesh);
+            otherPhysicsObjects.splice(i, 1);
+        } else {
+            Label4.position.set(position.x, position.y + 1.1, position.z);
+        }
+        
+    }
+
+    /* --------------------------------- Updates -------------------------------- */
 
     updateUniforms();
 

@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "@dimforge/rapier3d-compat": "^0.20.0",
     "howler": "^2.2.4"
   }
 }
