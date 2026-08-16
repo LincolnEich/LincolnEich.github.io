@@ -29,7 +29,7 @@ await renderer.init()
 
 /* ------------------------------ Rapier Setup ------------------------------ */
 await RAPIER.init();
-const gravity = { x:0.0, y:-9.81, z:0.0 };
+const gravity = { x:0.0, y:-12, z:0.0 };
 const world = new RAPIER.World(gravity);
 const mainPhysicsObjects = [];
 const otherPhysicsObjects = [];
@@ -145,7 +145,7 @@ button.addEventListener("click", async function() {
 
     const cubeBody = world.createRigidBody( RAPIER.RigidBodyDesc.dynamic().setTranslation(0, 5, 0).setRotation(new THREE.Quaternion().setFromEuler(
         new THREE.Euler(Math.random() * Math.PI * 2, Math.random() * Math.PI * 2, Math.random() * Math.PI * 2))) )
-    const cubeDesc = RAPIER.ColliderDesc.convexHull(cubeGeo.attributes.position.array).setMass(5).setRestitution(0.0);
+    const cubeDesc = RAPIER.ColliderDesc.convexHull(cubeGeo.attributes.position.array).setMass(5).setRestitution(0.2);
     world.createCollider(cubeDesc, cubeBody);
     otherPhysicsObjects.push({mesh: cube, body: cubeBody});
     
@@ -161,8 +161,21 @@ scene.add(hemiLight);
 /* -------------------------------------------------------------------------- */
 
 const cssElement1 = document.createElement('div');
-cssElement1.className = 'Container1';
-cssElement1.innerHTML = ` <h5>.Cube</h5> `;
+cssElement1.className = 'Container2';
+cssElement1.id
+cssElement1.innerHTML = ` <div class="blocker"></div>
+                        <div class="mask" id="openBtn">
+                            <div class="card">
+                            <h6>Click me to zoom</h6>
+                            <p1>
+                                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque nulla eros, varius at lobortis nec, ullamcorper vel nulla. Vestibulum vehicula ex nec lectus sodales rutrum in dictum eros. Duis quam sem, luctus id ante in, hendrerit consequat mauris. Nunc tristique nisl ac sem eleifend accumsan. Maecenas ex magna, dapibus eu dapibus et, tristique ac arcu. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus arcu massa, rhoncus sit amet aliquet et, mattis eu tortor. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos.
+                                Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec volutpat pulvinar tellus eu cursus. Mauris et magna mauris. Donec quam enim, eleifend at egestas quis, facilisis eu massa. Morbi cursus vestibulum dolor sit amet efficitur. Praesent id lobortis tortor, rhoncus auctor purus. Phasellus dictum facilisis augue quis imperdiet. Sed congue lorem eu orci suscipit sagittis. Phasellus aliquet vehicula nibh, ac fermentum tortor euismod vitae. Donec vitae eros sit amet erat laoreet hendrerit non id lacus. Aliquam eu dui fermentum, gravida est id, mattis enim. Vivamus imperdiet bibendum dolor, id tincidunt dolor porttitor vitae.
+                                In nisi nisi, varius quis facilisis tristique, aliquam at tortor. Aliquam eget tempor lectus. Aenean id dolor placerat augue consequat lobortis sit amet at augue. Duis a hendrerit nulla, fringilla auctor elit. Donec efficitur nec lectus vel scelerisque. Sed venenatis pharetra nisl, id tempor magna molestie vitae. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec tincidunt felis ac arcu vehicula semper.
+                                Nam ut arcu luctus, ultricies turpis vel, pellentesque risus. Sed quam est, fringilla at erat at, sagittis pulvinar est. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Donec luctus dolor id sem pellentesque, sit amet consectetur tellus hendrerit. Vivamus venenatis orci vel aliquam dictum. Donec non fringilla metus, sit amet mollis orci. Etiam fringilla nibh eu enim mattis rhoncus. Vivamus bibendum libero quis lorem tincidunt sollicitudin. Praesent vel tellus varius, vestibulum mi et, viverra turpis. Maecenas eros ligula, posuere sit amet vulputate ut, venenatis non augue.
+                                Suspendisse luctus feugiat diam, in mattis elit ornare ut. Nam est urna, fringilla ut tellus aliquam, porta tempor turpis. Integer mattis egestas ante at laoreet. Integer ultricies sem ut metus efficitur, in rutrum sapien efficitur. Fusce eleifend justo non nisl sollicitudin, eget consectetur lorem vulputate. Integer pulvinar condimentum neque, et iaculis velit sollicitudin sit amet. Pellentesque est lorem, porta vitae dignissim eu, aliquam eu mauris. Nam auctor congue orci nec rutrum. Suspendisse efficitur augue a ornare sodales. Curabitur ex ante, posuere ac ipsum malesuada, hendrerit tincidunt risus. In ex elit, imperdiet sit amet pharetra vel, euismod sed ante. Maecenas sed risus quis lectus mollis gravida lobortis eu arcu.
+                                </p1>
+                            </div>
+                        </div> `;
 
 const Label1 = new CSS2DObject(cssElement1);
 scene.add(Label1);
@@ -190,6 +203,24 @@ cssElement4.innerHTML = ` <h5>.Cotton</h5> `;
 const Label4 = new CSS2DObject(cssElement4);
 scene.add(Label4);
 Label4.position.set(0, 99999, 0);
+
+/* ---------------------------- CSS Manipulation ---------------------------- */
+
+//const openBtn = document.getElementById('#openBtn');
+const openBtn = cssElement1.querySelector('#openBtn')
+let openCheck1 = 0;
+
+openBtn.addEventListener('click', () => {
+    if(!openCheck1) {
+        cssElement1.classList.add('active');
+        cssElement1.classList.remove('disabled');
+        openCheck1 = 1;
+    } else {
+        cssElement1.classList.remove('active');
+        cssElement1.classList.add('disabled');
+        openCheck1 = 0;
+    }
+});
 
 /* -------------------------------------------------------------------------- */
 /*                          Screen Orientation Checks                         */
@@ -219,9 +250,11 @@ function onWindowResize() {
 }
 
 window.addEventListener('wheel', (event) => {
-    targetZoom += event.deltaY * zoomSensitivity * 0.05;
+    if (!openCheck1) {
+        targetZoom += event.deltaY * zoomSensitivity * 0.05;
 
-    targetZoom = Math.max(minZoom, Math.min(maxZoom, targetZoom));
+        targetZoom = Math.max(minZoom, Math.min(maxZoom, targetZoom));
+    }
 });
 
 /* -------------------------------------------------------------------------- */
@@ -278,7 +311,7 @@ const sceneAlpha = distortedSceneNode.a;
 const luminance = dot(vec3(0.2126, 0.7152, 0.0722), distortedSceneNode.rgb);
 const lineFrequency = float(200); //200
 const diagonalCoord = correctedUv.x.add(panXUniform.div(7)).add((correctedUv.y).sub(panYUniform.div(7))).mul(lineFrequency);
-const diagonalLines = sin(diagonalCoord).mul(8); //2?
+const diagonalLines = sin(diagonalCoord).mul(2); //2?
 const shadowMask = (smoothstep(float(0.3), float(0.0), luminance)).div(5);
 const lineIntensity = diagonalLines.mul(shadowMask);
 const hatchedColor = distortedSceneNode.mul(lineIntensity);
@@ -334,7 +367,6 @@ function animate() {
 
     shakeBody.setNextKinematicTranslation({ x: Math.sin(mytime) * -3, y: 0, z: Math.cos(mytime) * -3 });
     boxBody.setNextKinematicTranslation({ x: Math.sin(mytime) * 3, y: 0, z: Math.cos(mytime) * 3 });
-    Label1.position.set(cube.position.x, + 1.2, cube.position.z);
     Label2.position.set(shake.position.x, + 1.2, shake.position.z);
 
     for (const obj of mainPhysicsObjects) {
@@ -361,6 +393,17 @@ function animate() {
             Label4.position.set(position.x, position.y + 1.1, position.z);
         }
         
+    }
+
+    /* ---------------------------- CSS Manipulation ---------------------------- */
+
+    if (!openCheck1) {
+        Label1.renderOrder = 0;
+        const targetVec = new THREE.Vector3(cube.position.x, + 1.2, cube.position.z);
+        Label1.position.lerp(targetVec, 0.05);
+    } else {
+        Label1.renderOrder = 999;
+        Label1.position.lerp(controls.target, 0.05)
     }
 
     /* --------------------------------- Updates -------------------------------- */
