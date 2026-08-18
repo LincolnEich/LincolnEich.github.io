@@ -4,7 +4,7 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { CSS2DRenderer } from 'three/addons/renderers/CSS2DRenderer.js';
 import { CSS2DObject } from 'three/addons/renderers/CSS2DRenderer.js';
 import RAPIER from '@dimforge/rapier3d-compat';
-import { uv, dot, sin, pass, time, vec2, vec3, float, floor, uniform, screenSize, smoothstep, mx_noise_float } from 'three/tsl';
+import { uv, dot, sin, pass, time, vec2, vec3, float, floor, lights, uniform, screenSize, smoothstep, mx_noise_float } from 'three/tsl';
 import { dotScreen } from 'three/addons/tsl/display/DotScreenNode.js';
 import { film } from 'three/addons/tsl/display/FilmNode.js';
 
@@ -63,10 +63,15 @@ const boxGeo = new THREE.BoxGeometry(1, 1, 1);
 const material = new THREE.MeshLambertNodeMaterial({ 
     color: 0xffffff
 });
+
+const toonMaterial = new THREE.MeshToonNodeMaterial({
+  color: 0xffffff
+});
+
 const knot = new THREE.Mesh(torusGeo, material);
 const cube = new THREE.Mesh(boxGeo, material);
-//knot.autoUpdate = true;
-//cube.autoUpdate = true;
+knot.autoUpdate = true;
+cube.autoUpdate = true;
 scene.add(knot, cube);
 
 cube.position.set(5, 0, 0);
@@ -156,15 +161,41 @@ button.addEventListener("click", async function() {
 const hemiLight = new THREE.HemisphereLight(0xffffff, 0x000000, 2);
 scene.add(hemiLight);
 
+/*const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
+directionalLight.position.set(0,5,0);
+scene.add(directionalLight);*/
+
+/* -------------------------------------------------------------------------- */
+/*                                Howler Setup                                */
+/* -------------------------------------------------------------------------- */
+
+const open = new Howl({
+  src: ['Assets/Audio/Open.mp3'],
+  volume: 1.0
+});
+
+const close = new Howl({
+  src: ['Assets/Audio/Close.mp3'],
+  volume: 1.0
+});
+
+const slideIn = new Howl({
+  src: ['Assets/Audio/Slide In.mp3'],
+  volume: 1.0
+});
+
+const slideOut = new Howl({
+  src: ['Assets/Audio/Slide Out.mp3'],
+  volume: 1.0
+});
+
 /* -------------------------------------------------------------------------- */
 /*                                CSS Elements                                */
 /* -------------------------------------------------------------------------- */
 
 const cssElement1 = document.createElement('div');
 cssElement1.className = 'Container2';
-cssElement1.id
-cssElement1.innerHTML = ` <div class="blocker"></div>
-                        <div class="mask" id="openBtn">
+cssElement1.innerHTML = ` <div class="mask" id="openBtn">
                             <div class="card">
                             <h6>Click me to zoom</h6>
                             <p1>
@@ -176,7 +207,6 @@ cssElement1.innerHTML = ` <div class="blocker"></div>
                                 </p1>
                             </div>
                         </div> `;
-
 const Label1 = new CSS2DObject(cssElement1);
 scene.add(Label1);
 
@@ -206,7 +236,6 @@ Label4.position.set(0, 99999, 0);
 
 /* ---------------------------- CSS Manipulation ---------------------------- */
 
-//const openBtn = document.getElementById('#openBtn');
 const openBtn = cssElement1.querySelector('#openBtn')
 let openCheck1 = 0;
 
@@ -214,10 +243,14 @@ openBtn.addEventListener('click', () => {
     if(!openCheck1) {
         cssElement1.classList.add('active');
         cssElement1.classList.remove('disabled');
+        open.play();
+        slideIn.play();
         openCheck1 = 1;
     } else {
         cssElement1.classList.remove('active');
         cssElement1.classList.add('disabled');
+        close.play();
+        slideOut.play();
         openCheck1 = 0;
     }
 });
@@ -349,9 +382,9 @@ function animate() {
     
     controls.update();
 
-    world.step();
-
     /* --------------------------- Object Manipulation -------------------------- */
+
+    world.step();
 
     rotX += 0.005 * (currentDistance - targetZoom) + 0.005;
     rotY += 0.005 * (currentDistance - targetZoom) + 0.005;
@@ -375,6 +408,8 @@ function animate() {
 
         obj.mesh.position.set(position.x, position.y, position.z);
         obj.mesh.quaternion.set(rotation.x, rotation.y, rotation.z, rotation.w);
+
+        obj.mesh.updateMatrixWorld();
     }
 
     for (let i = 0; i <= otherPhysicsObjects.length - 1; i++) {
@@ -384,6 +419,8 @@ function animate() {
 
         obj.mesh.position.set(position.x, position.y, position.z);
         obj.mesh.quaternion.set(rotation.x, rotation.y, rotation.z, rotation.w);
+
+        obj.mesh.updateMatrixWorld();
 
         if (position.y < -25) {
             world.removeRigidBody(obj.body);
@@ -403,7 +440,7 @@ function animate() {
         Label1.position.lerp(targetVec, 0.05);
     } else {
         Label1.renderOrder = 999;
-        Label1.position.lerp(controls.target, 0.05)
+        Label1.position.lerp(controls.target, 0.1)
     }
 
     /* --------------------------------- Updates -------------------------------- */
