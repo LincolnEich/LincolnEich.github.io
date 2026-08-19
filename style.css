@@ -68,7 +68,12 @@ h1 {
   color: rgb(25, 25, 25);
   text-shadow: 0px 1px 5px rgba(20, 20, 20, 0.75);
   opacity: 0;
-  animation: fadeIn 1.5s ease-in-out forwards, easeUp 1.5s ease-out forwards, wobble 3s ease-in-out 2s infinite;
+  animation: fadeIn 1.5s ease-in-out forwards, easeUp 1.5s ease-out forwards;
+}
+
+.wavy {
+  position: relative;
+  animation: wavy 1.5s ease-in-out infinite;
 }
 
 h2 {
@@ -101,16 +106,20 @@ h4 {
   font-weight: 700;
 }
 
-canvas {
+.canvas {
   position: absolute;
   width: 100vw;
   height: 100dvh;
 
   z-index: 0;
   opacity: 0;
-  animation: fadeIn 1.5s ease-in-out 0s forwards;
     
   overflow: hidden;
+  transition: all 1.5s ease;
+}
+
+.canvas.fadeIn {
+  animation: fadeIn 1.5s ease-in-out forwards, easeUp 1.5s ease-out forwards;
 }
 
 .container3 {
@@ -131,6 +140,7 @@ canvas {
   position: absolute;
   margin: 0;
   padding: 4vmin;
+  background-color: rgb(220, 220, 220);
   border: 1vmin double rgba(20, 20, 20, 1);
   border-radius: 10dvh;
   box-shadow: 0px 5px 10px rgba(20, 20, 20, 0.75);
@@ -140,7 +150,7 @@ canvas {
 
   pointer-events: auto;
 
-  transition: box-shadow 0.2s ease, transform 0.2s ease;
+  transition: all 0.2s ease;
   animation: fadeIn 1.5s ease-in-out forwards, easeUp 1.5s ease-out;
 }
 
@@ -152,15 +162,17 @@ canvas {
 }
 
 #boxButton:hover {
+  background-color: rgb(255, 255, 255);
   box-shadow: 0px 4px 10px rgba(20, 20, 20, 0.55);
   transform: scale(1.05);
-  transition: box-shadow 0.2s ease, transform 0.2s ease;
+  transition: all 0.2s ease;
 }
 
 #boxButton:active {
+  background-color: rgb(210, 210, 210);
   box-shadow: 0px 0px 15px rgba(20, 20, 20, 1);
   transform: translateY(4px) scale(0.95);
-  transition: box-shadow 0.05s ease, transform 0.05s ease;
+  transition: all 0.05s ease;
 }
 
 
@@ -168,7 +180,7 @@ canvas {
 .Container1 {
   position: absolute;
   margin: 0;
-  background-color: rgb(221, 221, 221);
+  background-color: rgb(220, 220, 220);
   border-radius: 1.2vmax;
   box-shadow: 0px 5px 2px rgba(20, 20, 20, 0.75);
 
@@ -219,7 +231,7 @@ h5 {
 .mask {
   width: 11vmax;
   height: 7.2vmax;
-  background-color: rgb(221, 221, 221);
+  background-color: rgb(220, 220, 220);
   border-radius: 1.4vmax;
   box-shadow: 0px 7px 5px rgba(20, 20, 20, 0.55);
 
@@ -236,6 +248,7 @@ h5 {
 }
 
 .mask:hover {
+  background-color: rgb(255, 255, 255);
   border-radius: 1.6vmax;
   padding: 0.5vmax;
 }
@@ -278,7 +291,7 @@ p1 {
 
 .Container2.active .mask {
   cursor: default;
-  animation: biggen .4s ease-out forwards normal;
+  animation: biggen .4s ease-out forwards;
 }
 
 .Container2.active .card {
@@ -295,14 +308,14 @@ body:has(.active) :is(.container3, .container2) {
 }
 
 .Container2.disabled .mask {
-  animation: smallen .4s ease-out forwards;
+  animation: smallen .4s ease-out ;
 }
 
 @keyframes biggen {
   from {
     width: 11vmax;
   height: 7.2vmax;
-    background-color: rgba(221, 221, 221, 1);
+    background-color: rgba(220, 220, 220, 1);
   }
   to {
     width: 80vmin;
@@ -320,7 +333,7 @@ body:has(.active) :is(.container3, .container2) {
   to {
     width: 11vmax;
     height: 7.2vmax;
-    background-color: rgba(221, 221, 221, 1);
+    background-color: rgba(220, 220, 220, 1);
   }
 }
 
@@ -345,13 +358,25 @@ body:has(.active) :is(.container3, .container2) {
 }
 
 @keyframes wobble {
- 0% {transform: translateY(0px); }
- 50% {transform: translateY(10px); }
- 100% {transform: translateY(0px); }
+ 0% {transform: translateY(-5px); }
+ 50% {transform: translateY(5px); }
+ 100% {transform: translateY(-5px); }
 }
 
 @keyframes bob {
- 0% {transform: translateY(0px); }
- 50% {transform: translateY(10px); }
- 100% {transform: translateY(0px); }
+ 0% {transform: translateY(-5px); }
+ 50% {transform: translateY(5px); }
+ 100% {transform: translateY(-5px); }
+}
+
+@keyframes wavy {
+  0% {
+    top: 0dvh;
+  }
+  50% {
+    top: -1dvh;
+  }
+  100% {
+    top: 0dvh;
+  }
 }

@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lincoln's Portfolio</title>
+    <title>Linc's Playground</title>
     <link rel="icon" type="image/x-icon" href="/Assets/Images/Star Icon.ico">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.2.4/howler.min.js"></script>
     <script src="audio.js" defer></script>
-    <script type="importmap">
+    <script defer type="importmap">
         {
             "imports": {
                 "three": "https://cdn.jsdelivr.net/npm/three@v0.181.0/build/three.webgpu.js",
@@ -26,7 +26,7 @@
 
 <body>
     <div class="container1">
-        <h1>Rotating</h1>
+        <h1 id="animated">Rotating</h1>
         <h3>Toroid</h3>
     </div>
     <div class="container2">
@@ -36,8 +36,9 @@
     <div class="container3">
         <button id="boxButton"> </button>
     </div>
+    <button></button>
     <div class="blocker"></div>
-    <script type="module" src="index.js" defer></script>
+    <script defer type="module" src="index.js"></script>
 </body>
 
 </html>

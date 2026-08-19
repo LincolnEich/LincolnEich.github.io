@@ -4,7 +4,7 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { CSS2DRenderer } from 'three/addons/renderers/CSS2DRenderer.js';
 import { CSS2DObject } from 'three/addons/renderers/CSS2DRenderer.js';
 import RAPIER from '@dimforge/rapier3d-compat';
-import { uv, Fn, dot, sin, pass, time, vec2, vec3, float, floor, lights, uniform, texture, screenUV, screenSize, remapClamp, smoothstep, mx_noise_float } from 'three/tsl';
+import { uv, dot, sin, pass, time, vec2, vec3, float, floor, uniform, screenSize, smoothstep, texture, mx_noise_float } from 'three/tsl';
 import { dotScreen } from 'three/addons/tsl/display/DotScreenNode.js';
 import { film } from 'three/addons/tsl/display/FilmNode.js';
 import { outline } from 'three/addons/tsl/display/OutlineNode.js';
@@ -55,22 +55,32 @@ labelRenderer.domElement.style.top = '0px';
 labelRenderer.domElement.style.pointerEvents = 'none';
 document.body.appendChild( labelRenderer.domElement );
 
+/* --------------------------------- Loader --------------------------------- */
+
+const manager = new THREE.LoadingManager();
+const canvas = document.querySelector('canvas');
+canvas.classList.add('canvas');
+
+manager.onLoad = () => {
+    canvas.classList.add('fadeIn');
+};
+
 /* -------------------------------------------------------------------------- */
 /*                              Scene Population                              */
 /* -------------------------------------------------------------------------- */
 
-const textureLoader = new THREE.TextureLoader();
+const textureLoader = new THREE.TextureLoader(manager);
 
 const torusGeo = new THREE.TorusGeometry(1.3, 0.5, 32, 72);
 const boxGeo = new THREE.BoxGeometry(1, 1, 1);
 const material = new THREE.MeshLambertNodeMaterial({ 
     color: 0xffffff
 });
-
+/*
 const toonMaterial = new THREE.MeshToonNodeMaterial({
   color: 0xffffff
 });
-
+*/
 const knot = new THREE.Mesh(torusGeo, material);
 const cube = new THREE.Mesh(boxGeo, material);
 knot.layers.enable(1);
@@ -90,7 +100,7 @@ scene.add(groundMesh);
 
 /* -------------------------- GLTF Loader + Objects ------------------------- */
 
-const loader = new GLTFLoader();
+const loader = new GLTFLoader(manager);
 
 const shakeGlb = await loader.loadAsync('Assets/Models/Sunshake/scene.gltf');
 const shake = shakeGlb.scene;
@@ -109,11 +119,11 @@ shake.traverse((child) =>{
 scene.add(shake);
 shake.scale.set(5, 5, 5);
 
-const fossilGlb = await loader.loadAsync('Assets/Models/Fossil/Star 2.gltf');
+const fossilGlb = await loader.loadAsync('Assets/Models/Fossil/Star.glb');
 const fossil = fossilGlb.scene;
 let fossilGeo = null;
 
-const starTexture = textureLoader.load('Assets/Models/Fossil/Text 2.png');
+const starTexture = textureLoader.load('Assets/Models/Fossil/Text.png');
 const starMat = new THREE.MeshBasicMaterial({ 
     map: starTexture
 });
@@ -126,9 +136,11 @@ fossil.traverse((child) =>{
     }
 })
 
-scene.add(fossil);
 fossil.scale.set(0.35, 0.35, 0.35);
+let fossilCopy = fossil.clone();
+fossilCopy.scale.set(0.345, 0.345, 0.345);
 
+scene.add(fossil, fossilCopy);
 const array = [shake, fossil, cube, knot];
 
 /* ------------------------------ Physics Setup ----------------------------- */
@@ -326,8 +338,6 @@ window.addEventListener('wheel', (event) => {
 /*                               Post Processing                              */
 /* -------------------------------------------------------------------------- */
 
-
-
 const postProcessing = new THREE.PostProcessing(renderer);
 const scenePass = pass(scene, camera);
 scenePass.samples = 4; 
@@ -366,6 +376,8 @@ function updateUniforms() {
     scaleY.value = Math.max(w/h/1.25, 1);
 }
 
+/* --------------------------------- Distort -------------------------------- */
+
 const steppedTime = floor(time.mul(10)); //10
 const aspectRatio = screenSize.x.div(screenSize.y);
 const correctedUv = uv().mul(vec2(aspectRatio, float(1.0)));
@@ -377,26 +389,24 @@ const noiseX = mx_noise_float(samplePos.add(vec2(animOffset.add(panXUniform.mul(
 const noiseY = mx_noise_float(samplePos.add(vec2(panXUniform.mul(14), animOffset.sub(panYUniform.mul(14)))));
 const proceduralOffset = vec2(noiseX.mul(scaleX), noiseY.mul(scaleY)).mul(distortionScale);
 const distortedUv = uv().add(proceduralOffset);
-const distortedSceneNode = scenePass.getTextureNode('output').sample(distortedUv);
 const distortedFxNode = fxPass.getTextureNode('output').sample(distortedUv);
-const distortedSceneDepth = sceneDepth.sample(distortedUv);
 const distortedFxDepth = fxDepth.sample(distortedUv);
+
+/* --------------------------------- Outline -------------------------------- */
 
 const edgeStrength = uniform( 10.0 );
 const edgeGlow = uniform( 5.0 );
 const edgeThickness = uniform( 1.0 );
-const visibleEdgeColor = uniform( new THREE.Color( 0x0000ff ) );
-const hiddenEdgeColor = uniform( new THREE.Color( 0x4e3636 ) );
-
 const outlinePass = outline( scene, camera, {
     edgeStrength,
     edgeGlow,
-    edgeThickness,
-} );
-
-outlinePass.selectedObjects = [fossil];
+    edgeThickness
+});
+outlinePass.selectedObjects = [fossilCopy];
 const { visibleEdge, hiddenEdge } = outlinePass;
 const outlineColor = visibleEdge.mul( 10 ).add( hiddenEdge.mul( 10 ));
+
+/* --------------------------------- Hashes --------------------------------- */
 
 const sceneAlpha = distortedFxNode.a;
 const luminance = dot(vec3(0.2126, 0.7152, 0.0722), distortedFxNode.rgb);
@@ -408,15 +418,15 @@ const lineIntensity = diagonalLines.mul(shadowMask);
 const hatchedColor = distortedFxNode.mul(lineIntensity);
 const finalHatch = (distortedFxNode.add(hatchedColor.rgb)).mul(sceneAlpha);
 
+/* ---------------------------------- Other --------------------------------- */
 
 const filmPass = film(finalHatch, 0.75);
 const dotPass = dotScreen(filmPass);
 dotPass.scale.value = 1.4;
 
-const isOccluded = distortedFxDepth.greaterThan(distortedSceneDepth);
-
+const isOccluded = distortedFxDepth.greaterThan(sceneDepth);
 const finalFrameColor = isOccluded.select(
-    distortedSceneNode,   
+    scenePass,
     dotPass
 );
 
@@ -501,11 +511,14 @@ function animate() {
         
     }
 
+    fossilCopy.position.copy(fossil.position);
+    fossilCopy.rotation.copy(fossil.rotation);
+
     /* ---------------------------- CSS Manipulation ---------------------------- */
 
     if (!openCheck1) {
         Label1.renderOrder = 0;
-        const targetVec = new THREE.Vector3(fossil.position.x, + 1.2, fossil.position.z);
+        const targetVec = new THREE.Vector3(Math.sin(mytime + 0.175) * 3, + 1.2, Math.cos(mytime + 0.175) * 3);
         Label1.position.lerp(targetVec, 0.05);
     } else {
         Label1.renderOrder = 999;

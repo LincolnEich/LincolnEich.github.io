@@ -24,8 +24,8 @@ const slideOut = new Howl({
 });
 
 const bgMusic = new Howl({
-  src: ['Assets/Audio/Scrap Mechanic OST - Turning Gears.mp3'],
-  volume: 0.35,
+  src: ['Assets/Audio/Apogamy.mp3'],
+  volume: 0.2,
   loop: true
 });
 
@@ -55,3 +55,22 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
 });
+
+function updateText(element) {
+  let delay = 1000;
+
+  // Reassign the generated span tags back to h1.innerHTML
+  element.innerHTML = element.innerText
+    .split("")
+    .map(letter => `<span>${letter === " " ? "&nbsp;" : letter}</span>`)
+    .join("");
+
+  Array.from(element.children).forEach((span, index) => {
+    setTimeout(() => {
+      span.classList.add("wavy");
+    }, index * 200 + delay);
+  });
+}
+
+updateText(document.querySelector('h1'));
+updateText(document.querySelector('h2'));
