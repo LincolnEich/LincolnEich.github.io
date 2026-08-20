@@ -63,17 +63,17 @@ h1 {
   font-family: 'Libre Baskerville', Arial, serif;
   font-size: 8vmax;
   font-weight: 700;
-  color: rgb(25, 25, 25);
-  text-shadow: 0px 1px 5px rgba(20, 20, 20, 0.75);
-  opacity: 0;
+  color: rgba(25, 25, 25, 0);
 
-  animation: fadeIn 1.5s ease-in-out forwards, wobble 3s ease-in-out infinite;
+  animation: wobble 3s ease-in-out infinite;
   animation-play-state: paused;
 }
 
 .wavy {
+  color: rgba(25, 25, 25, 1);
+  text-shadow: 0px 1px 5px rgba(20, 20, 20, 0.75);
   position: relative;
-  animation: wavy 3s cubic-bezier(.43,-0.7,.35,.99) 1s infinite, easeUp 1.5s ease-out forwards, fadeIn 1.5s ease-in-out forwards;
+  animation: wavy 3s cubic-bezier(.43,-0.7,.35,.99) 1s infinite, fadeIn 1.5s ease-in-out forwards;
   animation-play-state: paused;
 }
 
@@ -83,11 +83,9 @@ h2 {
   font-family: 'Cooper', Arial, serif;
   font-size: 8vmax;
   font-weight: 400;
-  color: rgb(25, 25, 25);
-  text-shadow: 0px 1px 5px rgba(20, 20, 20, 0.75);
-  opacity: 0;
+  color: rgba(25, 25, 25, 0);
   
-  animation: fadeIn 1.5s ease-in-out 2s forwards, bob 3s ease-in-out 1.5s infinite;
+  animation: bob 3s ease-in-out 1.5s infinite;
   animation-play-state: paused;
 }
 
@@ -358,7 +356,7 @@ body:has(.active) :is(.container3, .container2) {
 
 @keyframes easeUp {
   from {
-    transform: translateY(20%);
+    transform: translateY(10%);
   }
   to {
     transform: translateY(0);
@@ -380,19 +378,16 @@ body:has(.active) :is(.container3, .container2) {
 @keyframes wavy {
   0% {
     top: 0dvh;
-    color: rgb(25, 25, 25);
-    text-shadow: 0px 1px 5px rgba(20, 20, 20, 0.75);
+    color: rgb(25, 25, 25, 1);
   }
   15% {
     top: -5dvh;
-    color: rgb(200, 200, 200);
-    text-shadow: 0px 1px 10px rgba(20, 20, 20, 0.75);
+    color: rgb(220, 220, 220);
     animation-timing-function: ease-in;
   }
   25% {
     top: 0dvh;
-    color: rgb(25, 25, 25);
-    text-shadow: 0px 1px 5px rgba(20, 20, 20, 0.75);
+    color: rgb(25, 25, 25, 1);
   }
   100% {
     top: 0dvh;
