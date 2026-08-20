@@ -33,7 +33,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   bgMusic.play();
 
-  /*
+  /* Fade Out
   bgMusic.on('play', function() {
     const bgmFade = 2000;
     const bgmDuration = bgMusic.duration() * 1000;
@@ -55,22 +55,3 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
 });
-
-function updateText(element) {
-  let delay = 1000;
-
-  // Reassign the generated span tags back to h1.innerHTML
-  element.innerHTML = element.innerText
-    .split("")
-    .map(letter => `<span>${letter === " " ? "&nbsp;" : letter}</span>`)
-    .join("");
-
-  Array.from(element.children).forEach((span, index) => {
-    setTimeout(() => {
-      span.classList.add("wavy");
-    }, index * 200 + delay);
-  });
-}
-
-updateText(document.querySelector('h1'));
-updateText(document.querySelector('h2'));

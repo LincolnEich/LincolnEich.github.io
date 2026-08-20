@@ -63,6 +63,27 @@ canvas.classList.add('canvas');
 
 manager.onLoad = () => {
     canvas.classList.add('fadeIn');
+
+    document.body.classList.add('loaded');
+
+    function updateText(element) {
+        element.innerHTML = element.innerText
+            .split("")
+            .map(letter => `<span>${letter === " " ? "&nbsp;" : letter}</span>`)
+            .join("");
+
+        Array.from(element.children).forEach((span, index) => {
+            span.style.opacity = 0;
+            setTimeout(() => {
+            span.classList.add("wavy");
+            }, index * 200);
+        });
+    }
+
+    updateText(document.querySelector('h1'));
+    setTimeout(() => {
+    updateText(document.querySelector('h2'));
+    }, 1600);
 };
 
 /* -------------------------------------------------------------------------- */
@@ -168,9 +189,10 @@ mainPhysicsObjects.push({mesh: shake, body: shakeBody});
 /* -------------------------- Other Physics Bodies -------------------------- */
 
 const button = document.getElementById("boxButton");
+const loader2 = new GLTFLoader();
 
 button.addEventListener("click", async function() {
-    const cubeGlb = await loader.loadAsync('Assets/Models/Spud/cotton_from_scrap_mechanic.glb');
+    const cubeGlb = await loader2.loadAsync('Assets/Models/Spud/cotton_from_scrap_mechanic.glb');
         const cube = cubeGlb.scene;
         let cubeGeo = null;
 
@@ -306,7 +328,7 @@ window.addEventListener('orientationchange', onWindowResize, false);
 
 function onWindowResize() {
     requestAnimationFrame(() => {
-        w = container.clientWidth;
+        w = container.clientWidth;  
         h = container.clientHeight;
 
         camera.aspect = w / h;

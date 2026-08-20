@@ -22,7 +22,7 @@ body {
 
   z-index: 4;
   pointer-events: none;
-  transition: all 0.5s ease;
+  transition: background 0.5s ease, backdrop-filter 0.5s ease;
 }
 
 .container1 {
@@ -35,7 +35,6 @@ body {
   align-content: center;
   flex-wrap: wrap;
   gap: 4%;
-  transform: translateY(-2%);
 
   overflow: hidden;
   pointer-events: none;
@@ -52,7 +51,6 @@ body {
   align-content: center;
   flex-wrap: wrap;
   gap: 4%;
-  transform: translateY(-2%);
 
   overflow: hidden;
   pointer-events: none;
@@ -68,12 +66,15 @@ h1 {
   color: rgb(25, 25, 25);
   text-shadow: 0px 1px 5px rgba(20, 20, 20, 0.75);
   opacity: 0;
-  animation: fadeIn 1.5s ease-in-out forwards, easeUp 1.5s ease-out forwards;
+
+  animation: fadeIn 1.5s ease-in-out forwards, wobble 3s ease-in-out infinite;
+  animation-play-state: paused;
 }
 
 .wavy {
   position: relative;
-  animation: wavy 1.5s ease-in-out infinite;
+  animation: wavy 3s cubic-bezier(.43,-0.7,.35,.99) 1s infinite, easeUp 1.5s ease-out forwards, fadeIn 1.5s ease-in-out forwards;
+  animation-play-state: paused;
 }
 
 h2 {
@@ -85,8 +86,15 @@ h2 {
   color: rgb(25, 25, 25);
   text-shadow: 0px 1px 5px rgba(20, 20, 20, 0.75);
   opacity: 0;
-  animation: fadeIn 1.5s ease-in-out forwards, easeUp 1.5s ease-out forwards, bob 3s ease-in-out 1.5s infinite;
+  
+  animation: fadeIn 1.5s ease-in-out 2s forwards, bob 3s ease-in-out 1.5s infinite;
+  animation-play-state: paused;
 }
+
+.loaded .wavy, h1, h2 {
+  animation-play-state: running;
+}
+
 
 h3 {
   margin: 0;
@@ -115,7 +123,7 @@ h4 {
   opacity: 0;
     
   overflow: hidden;
-  transition: all 1.5s ease;
+  transition: opacity 1.5s ease;
 }
 
 .canvas.fadeIn {
@@ -140,7 +148,7 @@ h4 {
   position: absolute;
   margin: 0;
   padding: 4vmin;
-  background-color: rgb(220, 220, 220);
+  background-color: rgb(240, 240, 240);
   border: 1vmin double rgba(20, 20, 20, 1);
   border-radius: 10dvh;
   box-shadow: 0px 5px 10px rgba(20, 20, 20, 0.75);
@@ -150,7 +158,7 @@ h4 {
 
   pointer-events: auto;
 
-  transition: all 0.2s ease;
+  transition: background-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
   animation: fadeIn 1.5s ease-in-out forwards, easeUp 1.5s ease-out;
 }
 
@@ -165,14 +173,14 @@ h4 {
   background-color: rgb(255, 255, 255);
   box-shadow: 0px 4px 10px rgba(20, 20, 20, 0.55);
   transform: scale(1.05);
-  transition: all 0.2s ease;
+  transition: background-color 0.1s ease, box-shadow 0.1s ease, transform 0.1s ease;
 }
 
 #boxButton:active {
   background-color: rgb(210, 210, 210);
   box-shadow: 0px 0px 15px rgba(20, 20, 20, 1);
   transform: translateY(4px) scale(0.95);
-  transition: all 0.05s ease;
+  transition: background-color 0.1s ease, box-shadow 0.1s ease, transform 0.1s ease;
 }
 
 
@@ -244,7 +252,7 @@ h5 {
   -webkit-tap-highlight-color: transparent;
   cursor: pointer;
   
-  transition: all 0.3s ease;
+  transition: background-color 0.3s ease, border-radius 0.3s ease, padding 0.3s ease;
 }
 
 .mask:hover {
@@ -350,31 +358,41 @@ body:has(.active) :is(.container3, .container2) {
 
 @keyframes easeUp {
   from {
-    transform: translateY(30px);
+    transform: translateY(20%);
   }
   to {
-    transform: translateY(0px);
+    transform: translateY(0);
   }
 }
 
 @keyframes wobble {
- 0% {transform: translateY(-5px); }
- 50% {transform: translateY(5px); }
- 100% {transform: translateY(-5px); }
+ 0% {transform: translateY(-3%); }
+ 50% {transform: translateY(3%); }
+ 100% {transform: translateY(-3%); }
 }
 
 @keyframes bob {
- 0% {transform: translateY(-5px); }
- 50% {transform: translateY(5px); }
- 100% {transform: translateY(-5px); }
+ 0% {transform: translateY(-3%); }
+ 50% {transform: translateY(3%); }
+ 100% {transform: translateY(-3%); }
 }
 
 @keyframes wavy {
   0% {
     top: 0dvh;
+    color: rgb(25, 25, 25);
+    text-shadow: 0px 1px 5px rgba(20, 20, 20, 0.75);
   }
-  50% {
-    top: -1dvh;
+  15% {
+    top: -5dvh;
+    color: rgb(200, 200, 200);
+    text-shadow: 0px 1px 10px rgba(20, 20, 20, 0.75);
+    animation-timing-function: ease-in;
+  }
+  25% {
+    top: 0dvh;
+    color: rgb(25, 25, 25);
+    text-shadow: 0px 1px 5px rgba(20, 20, 20, 0.75);
   }
   100% {
     top: 0dvh;
