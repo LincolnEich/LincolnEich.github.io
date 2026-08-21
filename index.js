@@ -63,27 +63,6 @@ canvas.classList.add('canvas');
 
 manager.onLoad = () => {
     canvas.classList.add('fadeIn');
-
-    document.body.classList.add('loaded');
-
-    function updateText(element) {
-        element.innerHTML = element.innerText
-            .split("")
-            .map(letter => `<span>${letter === " " ? "&nbsp;" : letter}</span>`)
-            .join("");
-
-        Array.from(element.children).forEach((span, index) => {
-            span.style.opacity = 0;
-            setTimeout(() => {
-            span.classList.add("wavy");
-            }, index * 200);
-        });
-    }
-
-    updateText(document.querySelector('h1'));
-    setTimeout(() => {
-    updateText(document.querySelector('h2'));
-    }, 1600);
 };
 
 /* -------------------------------------------------------------------------- */
@@ -262,6 +241,13 @@ cssElement1.className = 'Container2';
 cssElement1.innerHTML = ` <div class="mask" id="openBtn">
                             <div class="card">
                             <h6>Click me to zoom</h6>
+                            <iframe 
+                                src="rain.html" 
+                                width="89%" 
+                                height="91%" 
+                                scrolling="no" 
+                                class="pico8">
+                            </iframe>
                             <p1>
                                 Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque nulla eros, varius at lobortis nec, ullamcorper vel nulla. Vestibulum vehicula ex nec lectus sodales rutrum in dictum eros. Duis quam sem, luctus id ante in, hendrerit consequat mauris. Nunc tristique nisl ac sem eleifend accumsan. Maecenas ex magna, dapibus eu dapibus et, tristique ac arcu. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus arcu massa, rhoncus sit amet aliquet et, mattis eu tortor. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos.
                                 Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec volutpat pulvinar tellus eu cursus. Mauris et magna mauris. Donec quam enim, eleifend at egestas quis, facilisis eu massa. Morbi cursus vestibulum dolor sit amet efficitur. Praesent id lobortis tortor, rhoncus auctor purus. Phasellus dictum facilisis augue quis imperdiet. Sed congue lorem eu orci suscipit sagittis. Phasellus aliquet vehicula nibh, ac fermentum tortor euismod vitae. Donec vitae eros sit amet erat laoreet hendrerit non id lacus. Aliquam eu dui fermentum, gravida est id, mattis enim. Vivamus imperdiet bibendum dolor, id tincidunt dolor porttitor vitae.
