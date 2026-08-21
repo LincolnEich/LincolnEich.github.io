@@ -128,22 +128,13 @@ function animationLoop() {
   requestAnimationFrame(animationLoop);
 }
 
-let loadCheck = 0;
-
 window.addEventListener("load", () => {
-  loadCheck = 1;
-});
-
-document.addEventListener("visibilitychange", () => {
-    if (loadCheck == 1) {
-      loadCheck = 2;
-      setWavyText(elh1);
-      setTimeout(() => {
+    setWavyText(elh1);
+    setTimeout(() => {
       setWavyText(elh2);
-      }, 1600);
+    }, 1600);
 
-      setTimeout(() => {
-          requestAnimationFrame(animationLoop);
-      }, 1000);
-    }
+    setTimeout(() => {
+        requestAnimationFrame(animationLoop);
+    }, 1000);
 });
